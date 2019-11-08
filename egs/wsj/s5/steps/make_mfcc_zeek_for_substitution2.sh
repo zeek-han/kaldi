@@ -134,7 +134,7 @@ else
 
   utils/split_scp.pl $scp $split_scps || exit 1;
 
-  echo "ZZZZZZZZZZZZZZZ else:  ./compute_brainsoft_mfcc.tmp $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav"
+  echo "ZZZZZZZZZZZZZZZ else:  ./compute_brainsoft_mfcc $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav"
 
   # add ,p to the input rspecifier so that we can just skip over
   # utterances that have bad wave data.
@@ -154,7 +154,7 @@ else
   #    ark,scp:$mfccdir/raw_mfcc_$name.JOB.ark,$mfccdir/raw_mfcc_$name.JOB.scp \
   #    || exit 1;
   mkdir -p mfcc_input_wav
-  ./compute_brainsoft_mfcc.tmp $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav
+  ./compute_brainsoft_mfcc $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav
   echo "end_of_ZZZZZZZZZZZZZZZ else:  "
 fi
 
