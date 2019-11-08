@@ -4,6 +4,8 @@ input_scps=$1
 output_prefix=$2
 wav_dir=$3
 
+mkdir -p ./log
+
 ./make_mfcc_input_wav.py $input_scps $wav_dir	2>./log/make_mfcc_input_wav_err
 for wav_id_dir in `ls $wav_dir`; do
     ./psf_mfcc.py $input_scps $wav_dir/$wav_id_dir	2>"./log/psf_${wav_id_dir}"
