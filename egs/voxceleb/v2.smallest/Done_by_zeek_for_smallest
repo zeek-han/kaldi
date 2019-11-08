@@ -1,0 +1,7 @@
+#run.sh 	8:    --nj 40을 speaker수 보다 적어야 한다고 8로 고침 :			sid/compute_vad_decision.sh --nj 8 --cmd "$train_cmd" \
+#run.sh	115:  --nj  40 								--nj 8
+
+run.sh	109:	-1000000이면 subset의 개수가 모집합보다 크대.ㅠ:		-1000
+
+local/nnet3/xvector/run_xvector_smallest.sh에서 142번째 줄에 다음 옵션 추가     --trainer.optimization.num-jobs-final=8 \
+

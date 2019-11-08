@@ -26,7 +26,7 @@ if (system("mkdir -p $out_dir") != 0) {
   die "Error making directory $out_dir";
 }
 
-opendir my $dh, "$data_base/$dataset/wav" or die "Cannot open directory: $!";
+opendir my $dh, "$data_base/$dataset/wav" or die "Cannot open directory: $! ---$data_base/$dataset/wav";
 my @spkr_dirs = grep {-d "$data_base/$dataset/wav/$_" && ! /^\.{1,2}$/} readdir($dh);
 closedir $dh;
 

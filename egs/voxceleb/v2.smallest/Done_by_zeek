@@ -1,0 +1,25 @@
+go to src/ and do ./configure; make  ->for GPU usage. Unless do it, you would use CPU only even without threading.
+
+nvidia-smi -c 3
+
+
+�일단 기억나는대로 쓴다
+
+run.sh 80: cp data/train/vad.scp data/train_reverb/ 에 -f flag를 더해준다
+
+run.sh 22:                             nnet_dir=exp/xvector_nnet_1a    -> nnet_dir="/media/sangjik/hdd2/speaker_verification/kaldi/xvector_nnet_1a"
+steps/data/reverberate_data_dir.py 444: 추가함
+     if os.path.isfile(input_dir + "/vad.scp"):
+        add_prefix_to_fields(input_dir + "/vad.scp", output_dir + "/vad.scp", num_replicas, include_original, prefix, field =[0])
+
+local/nnet3/xvector/run_xvector.sh  22 nnet_dir=exp/xvector_nnet_1a/   -> nnet_dir="/media/sangjik/hdd2/speaker_verification/kaldi/xvector_nnet_1a"
+local/nnet3/xvector/run_xvector.sh  23 egs_dir=exp/xvector_nnet_1a/egs -> egs_dir="${nnet_dir}/egs"
+local/nnet3/xvector/run_xvector.sh  66 --nj 8 \                        -> --nj 2
+
+local/nnet3/xvector/run_xvector.sh  155 --use-gpu=true    	       -> --use_gpu=wait
+
+run.sh 165				--nj 80				-> --nj 20
+run.sh 170				--nj 40				-> --nj 10
+
+
+make_mfcc_zeek.sh                   8   compress=false                  -> compress=true

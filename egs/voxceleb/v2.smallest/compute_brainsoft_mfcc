@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+input_scps=$1
+output_prefix=$2
+
+

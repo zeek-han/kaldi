@@ -163,15 +163,21 @@ function filter_utts {
     maybe_utt2dur=utt2dur.ok
   fi
 
+  echo ZZZZZZ-10: $data/utt2num_frames
   maybe_utt2num_frames=
   if [ -f $data/utt2num_frames ]; then
     cat $data/utt2num_frames | \
       awk '{ if (NF == 2 && $2 > 0) { print }}' > $data/utt2num_frames.ok || exit 1
     maybe_utt2num_frames=utt2num_frames.ok
+    echo ZZZZZZ-10.0: `wc $data/$maybe_utt2num_frames` `wc $tmpdir/utts` `wc $data/utt2spk`
   fi
+  #echo ZZZZZZ-11: $maybe_utt2num_frames :  `wc $maybe_utt2num_frames`
 
   for x in feats.scp text segments utt2lang $maybe_wav $maybe_utt2dur $maybe_utt2num_frames; do
     if [ -f $data/$x ]; then
+      echo "fix_data_zeek-test_ZZZ: utils/filter_scp.pl $data/$x $tmpdir/utts > $tmpdir/utts.tmp"
+      echo ZZZZZZ-10.1: `wc $tmpdir/utts`
+      cp -f $tmpdir/utts ./tmp/${x}_utts
       utils/filter_scp.pl $data/$x $tmpdir/utts > $tmpdir/utts.tmp
       mv $tmpdir/utts.tmp $tmpdir/utts
     fi
