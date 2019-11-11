@@ -10,6 +10,12 @@ import scipy.io.wavfile as wav_file
 from pydub import AudioSegment
 from python_speech_features import mfcc as psf_mfcc
 
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
 if __name__ == '__main__':
     input_prefix = sys.argv[1]
     input_wav_dir = sys.argv[2]
@@ -37,8 +43,15 @@ if __name__ == '__main__':
             os.remove(wav)
         except OSError:
             pass
-
-    with open(utt2dur_path, 'w') as fd:
-        print('\n'.join(utt_durs), file=fd)
-    with open(utt2num_frames_path, 'w') as fd:
-        print('\n'.join(utt_num_frames), file=fd)
+    print(utt2dur_path)
+    try:
+        os.remove(utt2dur_path)
+        os.remove(utt2num_frames_path)
+    except OSError:
+        pass
+    with open(utt2dur_path, 'w') as fd1:
+        print('\n'.join(utt_durs), file=fd1)
+    print('\n'.join(utt_durs))
+    #print('file_len(utt2dur)=', file_len(utt2dur_path), len(utt_durs), utt_durs[0], utt_durs[-1])
+    with open(utt2num_frames_path, 'w') as fd2:
+        print('\n'.join(utt_num_frames), file=fd2)

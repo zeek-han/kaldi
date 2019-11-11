@@ -153,9 +153,19 @@ else
   #    --config=$mfcc_config scp,p:$logdir/wav_${name}.JOB.scp \
   #    ark,scp:$mfccdir/raw_mfcc_$name.JOB.ark,$mfccdir/raw_mfcc_$name.JOB.scp \
   #    || exit 1;
+  #for n in $(seq $nj); do
+  #  if [ -f $logdir/utt2dur.$n ]; then
+  #    echo zeeeeeek-1: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`
+  #  fi
+  #done
   mkdir -p mfcc_input_wav
   ./compute_brainsoft_mfcc $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav
   echo "end_of_ZZZZZZZZZZZZZZZ else:  "
+  #for n in $(seq $nj); do
+  #  if [ -f $logdir/utt2dur.$n ]; then
+  #    echo zeeeeeek0: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`
+  #  fi
+  #done
 fi
 
 
@@ -177,9 +187,15 @@ if $write_utt2num_frames; then
 fi
 
 if $write_utt2dur; then
+  #for n in $(seq $nj); do
+  #  echo zeeeeeek1: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`
+  #done
   for n in $(seq $nj); do
     cat $logdir/utt2dur.$n || exit 1
   done > $data/utt2dur || exit 1
+  #for n in $(seq $nj); do
+  #  echo zeeeeeek2: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`
+  #done
 fi
 
 # Store frame_shift and mfcc_config along with features.
@@ -188,8 +204,8 @@ frame_shift=$(perl -ne 'if (/^--frame-shift=(\d+)/) {
 echo ${frame_shift:-'0.01'} > $data/frame_shift
 mkdir -p $data/conf && cp $mfcc_config $data/conf/mfcc.conf || exit 1
 
-#rm $logdir/wav_${name}.*.scp  $logdir/segments.* \
-#   $logdir/utt2num_frames.* $logdir/utt2dur.* 2>/dev/null
+rm $logdir/wav_${name}.*.scp  $logdir/segments.* \
+   $logdir/utt2num_frames.* $logdir/utt2dur.* 2>/dev/null
 
 nf=$(wc -l < $data/feats.scp)
 nu=$(wc -l < $data/utt2spk)

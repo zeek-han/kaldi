@@ -416,6 +416,7 @@ def create_reverberated_copy(input_dir,
     """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    print('zeek_for_wav_scp: ', input_dir + '/wav.scp')
     wav_scp = parse_file_to_dict(input_dir + "/wav.scp", value_processor = lambda x: " ".join(x))
     if not os.path.isfile(input_dir + "/reco2dur"):
         print("Getting the duration of the recordings...");

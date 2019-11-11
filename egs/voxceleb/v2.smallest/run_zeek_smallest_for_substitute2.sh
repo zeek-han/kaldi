@@ -24,7 +24,7 @@ musan_root=/media/sangjik/hdd2/dataset/sound/musan
 
 stage=0
 echo stage 0
-rm -rf ./data mfcc_input_wav;
+rm -rf ./data ./mfcc_input_wav;
 if [ $stage -le 0 ]; then
   local/make_voxceleb2.pl $voxceleb2_root dev data/voxceleb2_train
   local/make_voxceleb2.pl $voxceleb2_root test data/voxceleb2_test
