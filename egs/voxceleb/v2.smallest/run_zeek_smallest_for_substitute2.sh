@@ -17,10 +17,10 @@ vaddir=`pwd`/mfcc
 
 # The trials file is downloaded by local/make_voxceleb1_v2.pl.
 voxceleb1_trials=data/voxceleb1_test/trials
-voxceleb1_root=/media/sangjik/hdd2/dataset/speech/English/vox_1_subset_smallest/
-voxceleb2_root=/media/sangjik/hdd2/dataset/speech/English/vox_2_subset_smallest/
-nnet_dir="/media/sangjik/hdd2/speaker_verification/kaldi/xvector_nnet_1a.smallest"
-musan_root=/media/sangjik/hdd2/dataset/sound/musan
+voxceleb1_root=/home/sangjik/dataset/speech/English/vox_1_subset_smallest/
+voxceleb2_root=/home/sangjik/dataset/speech/English/vox_2_subset_smallest/
+nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.smallest"
+musan_root=/home/sangjik/dataset/sound/musan
 
 stage=0
 echo stage 0
@@ -66,7 +66,9 @@ if [ $stage -le 2 ]; then
 
   if [ ! -d "RIRS_NOISES" ]; then
     # Download the package that includes the real RIRs, simulated RIRs, isotropic noises and point-source noises
-    wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
+    if [ ! -f "rirs_noises.zip" ]; then
+        wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
+    fi
     unzip rirs_noises.zip
   fi
 

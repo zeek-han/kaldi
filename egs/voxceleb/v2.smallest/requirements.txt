@@ -4,4 +4,3 @@ librosa
 soundfile
 python_speech_features
 kaldiio
-matplotlib

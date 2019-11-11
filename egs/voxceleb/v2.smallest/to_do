@@ -1,0 +1,8 @@
+0. ~/.vimrc
+1. install docker
+2. run kaldi docker 
+3. git clone my own kaldi in local
+4. install my own kaldi
+5. pip install
+6. path modification
+7. run.sh
