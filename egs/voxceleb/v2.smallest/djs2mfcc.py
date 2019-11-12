@@ -150,7 +150,7 @@ if __name__ == '__main__':
     djs_root_dir = sys.argv[1]
     output_dir = sys.argv[2]
 
-    djses = glob(p_join(djs_root_dir, '*', '*.djs'))
+    djses = glob(p_join(djs_root_dir, '**', '*.djs'), recursive=True)
     this_save_djs = partial(save_mfcc, output_dir=output_dir)
     num_of_cpus = cpu_count()
     with Pool(num_of_cpus, maxtasksperchild=5) as p:
