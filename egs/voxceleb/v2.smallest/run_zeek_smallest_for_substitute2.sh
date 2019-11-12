@@ -16,8 +16,8 @@ vaddir=`pwd`/mfcc
 
 
 # The trials file is downloaded by local/make_voxceleb1_v2.pl.
-dataset_root="/media/sangjik/hdd2"
-#dataset_root="/home/sangjik"
+#dataset_root="/media/sangjik/hdd2"
+dataset_root="/home/sangjik"
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=$dataset_root/dataset/speech/English/vox_1_subset_smallest/
 voxceleb2_root=$dataset_root/dataset/speech/English/vox_2_subset_smallest/

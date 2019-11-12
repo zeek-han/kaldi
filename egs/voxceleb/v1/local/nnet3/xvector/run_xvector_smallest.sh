@@ -63,7 +63,7 @@ if [ $stage -le 6 ]; then
      /media/sangjik/hdd2/kaldi_voxceleb/b{03,04,05,06}/$USER/kaldi-data/egs/voxceleb2/v2/xvector-$(date +'%m_%d_%H_%M')/$egs_dir/storage $egs_dir/storage
   fi
   sid/nnet3/xvector/get_egs.sh --cmd "$train_cmd" \
-    --nj 2 \
+    --nj 1 \
     --stage 0 \
     --frames-per-iter 1000000000 \
     --frames-per-iter-diagnostic 100000 \
