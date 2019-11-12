@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import struct
 from glob import glob
@@ -110,7 +110,7 @@ def power_spectrogram(djs, lower_bound_freq, upper_bound_freq):
                                                        spectrogram = loadDJSpectrogram(djs, 1)
     assert lower_bound_freq >= lowest_freq
     assert highest_freq >= upper_bound_freq 
-    #python_speech_features라이브러리를 사용하기 위해서  Transpose를 해야함
+    #Transpose to use python_speech_features library
     return np.square(spectrogram[(lowest_freq - lower_bound_freq): \
                                  (upper_bound_freq - highest_freq)]).T
 
