@@ -9,8 +9,8 @@ mkdir -p ./log
 ./make_mfcc_input_wav.py $input_scps $wav_dir	2>./log/make_mfcc_input_wav_err
 for wav_id_dir in `echo $wav_dir/$(basename $input_scps)*`; do
     echo "BEFORE psf_mfcc: "$input_scps  - $wav_id_dir   
-    ./psf_mfcc.py $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
-    #./djt_mfcc.py $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
+    #./psf_mfcc.py $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
+    ./djt_mfcc.py $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
                                             2>"./log/djt_err_$(basename ${wav_id_dir})"
     ./write_mfcc_scp_ark.py  $wav_id_dir ${output_prefix}_${wav_id_dir#*wav_}
 done

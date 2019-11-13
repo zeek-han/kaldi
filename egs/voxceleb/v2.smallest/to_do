@@ -10,3 +10,9 @@
 8. scp rir_noises.zip
 9. run.sh
 ### run.sh를 --nj도 바꾸어야 하고 stage 3에서 augmentation 개수도 조정해주어야 함
+
+10.****** 
+몹시 중요.
+   run.sh안에 stage1과 stage3에서 steps/make_mfcc_zeek_for_substitution2.sh를 실행하는데, --nj를  default 40, smallest는 8인데
+   이 숫자만큼 dataset을 자르기 때문에 한 디렉토리안에 들어가는 wav의 개수가 이것에 의해 결정된다
+   너무 wav가 많으면 이 디렉토리별로 한번에 djs를 생성하기 때문에 너무 많으면 storage를 넘어간다. 
