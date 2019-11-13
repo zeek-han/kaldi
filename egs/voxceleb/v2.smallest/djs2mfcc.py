@@ -130,18 +130,12 @@ def save_mfcc(djs, output_dir='./'):
     lowest_freq = 50
     highest_freq = 7600
 
-    #mfcc_root_dir = dirname(djs).replace('/tmp_wav_for_djs/384000/', '/mfcc_cutted_by_6sec/')
-    mfcc_djs_dir = dirname(djs).replace('/tmp_wav_for_djs/384000/', 
-                                        '/mfcc_cutted_by_6sec/from_djs_int_ratio/mfcc_{}_mels_{}_fmin_{}_fmax_{}/'.format(n_mfcc, n_mels, lowest_freq, highest_freq))
 
     # mfcc from DJS
     djspec_square = power_spectrogram(djs, lowest_freq, highest_freq)
     mfcc_from_djs = mfcc(djspec_square, n_mfcc=n_mfcc, n_mels=n_mels, 
                          lowfreq=lowest_freq, highfreq=highest_freq)
-    #mfcc_djs_path = p_join(mfcc_root_dir, 'from_djs_int_ratio', 
-    #   'mfcc_{}_mels_{}_fmin_{}_fmax_{}'.format(n_mfcc, n_mels, lowest_freq, highest_freq),
-    #    basename(djs)[:-10] + '.npy')
-    mfcc_djs_path = p_join(mfcc_djs_dir, basename(djs)[:-10] + '.npy')
+    mfcc_djs_path = p_join(output_dir, basename(djs)[:-10] + '.npy')
     os.makedirs(dirname(mfcc_djs_path), exist_ok=True)
     np.save(mfcc_djs_path, mfcc_from_djs)
     print(mfcc_djs_path)
@@ -153,6 +147,6 @@ if __name__ == '__main__':
     djses = glob(p_join(djs_root_dir, '**', '*.djs'), recursive=True)
     this_save_djs = partial(save_mfcc, output_dir=output_dir)
     num_of_cpus = cpu_count()
-    with Pool(num_of_cpus, maxtasksperchild=5) as p:
-        p.map(save_mfcc, djses, chunksize=5)
+    with Pool(num_of_cpus, maxtasksperchild=100) as p:
+        p.map(this_save_djs, djses, chunksize=5)
 
