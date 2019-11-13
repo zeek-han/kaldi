@@ -9,3 +9,4 @@
 7. path modification
 8. scp rir_noises.zip
 9. run.sh
+### run.sh를 --nj도 바꾸어야 하고 stage 3에서 augmentation 개수도 조정해주어야 함

@@ -1,5 +1,25 @@
+아무것도 안했을때, 기본대로 그냥 돌림 (stft, x-vector, TDNN)
+약 3일 걸림
+EER: 3.293%
+minDCF(p-target=0.01): 0.3645
+minDCF(p-target=0.001): 0.5002
+
+-----------------------------------------------------------------
+
 ==== smallest_dataset,  djt_mfcc
 6시간걸림
 EER: 43.98% Tue Nov 12 14:56:48 UTC 2019
 minDCF(p-target=0.01): 0.9989
 minDCF(p-target=0.001): 0.9989
+
+-----------------------------------------------------------------
+
+==== smallest_but_long_dataset,  psf_mfcc
+real    11m12.603s
+user    57m10.029s
+sys 18m2.956s
+
+EER: 38.64% Wed Nov 13 05:22:32 UTC 2019
+minDCF(p-target=0.01): 0.9995
+minDCF(p-target=0.001): 0.9995
+
