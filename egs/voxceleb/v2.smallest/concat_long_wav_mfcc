@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+from glob import glob
+from os.path import basename, dirname, join as p_join
+
+import numpy as np
+
+long_wav_dir = sys.argv[1]
+mfcc_dir = sys.argv[2]
+
+wav_ids = set()
+for wav in sorted(glob(p_join(long_wav_dir, '*.wav'))):
+    wav_id = basename(wav).split('.')[0]
+    wav_ids.add(wav_id)
+
+# VoxCeleb1,2가 아니라 wav_ids가 많아질 것 같으면 multiprocess를 하도록 하자
+for wav_id in wav_ids:
+    new_mfcc_path = p_join(mfcc_dir, wav_id + '.npy')
+    mfcc_paths = sorted(glob(p_join(mfcc_dir, '{}.*.npy'.format(wav_id))))
+    cutted_mfccs = []
+    for i, mfcc_path in enumerate(mfcc_paths):
+        cutted_mfcc = np.load(mfcc_path)
+        if i > 0:
+            if len(cutted_mfcc) >= 1000:
+                cutted_mfcc = cutted_mfcc[1000:]
+        cutted_mfccs.append(cutted_mfcc)
+        os.remove(mfcc_path)
+    np.save(new_mfcc_path, np.concatenate(cutted_mfccs))

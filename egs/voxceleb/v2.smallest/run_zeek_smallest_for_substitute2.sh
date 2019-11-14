@@ -16,11 +16,11 @@ vaddir=`pwd`/mfcc
 
 
 # The trials file is downloaded by local/make_voxceleb1_v2.pl.
-#dataset_root="/media/sangjik/hdd2"
-dataset_root="/home/sangjik"
+dataset_root="/media/sangjik/hdd2"
+#dataset_root="/home/sangjik"
 voxceleb1_trials=data/voxceleb1_test/trials
-voxceleb1_root=$dataset_root/dataset/speech/English/old/vox_1_subset_smallest/
-voxceleb2_root=$dataset_root/dataset/speech/English/old/vox_2_subset_smallest/
+voxceleb1_root=$dataset_root/dataset/speech/English/vox_1_subset_smallest/
+voxceleb2_root=$dataset_root/dataset/speech/English/vox_2_subset_smallest/
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.smallest"
 musan_root=$dataset_root/dataset/sound/musan
 
@@ -48,14 +48,14 @@ if [ $stage -le 1 ]; then
   for name in train voxceleb1_test; do
     steps/make_mfcc_zeek_for_substitution2.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 8 --cmd "$train_cmd" \
       data/${name} exp/make_mfcc $mfccdir
-    echo stage1.0-make_mfcc_done_$name  `date`
+    echo stage1.0-make_mfcc_done_$name\t  `date`
     utils/fix_data_dir.sh data/${name}
     echo stage1.1-fix_data_done_$name    
     sid/compute_vad_decision.sh --nj 8 --cmd "$train_cmd" \
       data/${name} exp/make_vad $vaddir
-    echo stage1.2-vad_decision_done_$name    `date`
+    echo stage1.2-vad_decision_done_$name\t    `date`
     utils/fix_data_dir.sh data/${name}
-    echo stage1.3-fix_data_done_$name  `date`
+    echo stage1.3-fix_data_done_$name\t  `date`
   done
 fi
 
