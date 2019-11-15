@@ -1,8 +1,22 @@
-아무것도 안했을때, 기본대로 그냥 돌림 (stft, x-vector, TDNN)
+아무것도 안했을때, 기본대로 그냥 돌림   (kaldi_mfcc, x-vector, TDNN)
 약 3일 걸림
 EER: 3.293%
 minDCF(p-target=0.01): 0.3645
 minDCF(p-target=0.001): 0.5002
+
+-----------------------------------------------------------------
+==== origianl dataset but aug_1thousand,                  (psf_mfcc, x-vector, TDNN)
+real    3756m38.636s
+user    14842m29.638s
+sys 5547m48.884s
+약 2.6일 걸림
+(augmentation을 1m대신 1,000밖에 안했지만 --nj를 smallest설정에 맞춰서 했기 때문에 훨씬 느리게 수행함)
+
+EER: 3.616% Thu Nov 14 21:13:08 UTC 2019
+minDCF(p-target=0.01): 0.3607
+minDCF(p-target=0.001): 0.5121
+
+nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.psf_mfcc"
 
 -----------------------------------------------------------------
 
@@ -11,6 +25,7 @@ minDCF(p-target=0.001): 0.5002
 EER: 43.98% Tue Nov 12 14:56:48 UTC 2019
 minDCF(p-target=0.01): 0.9989
 minDCF(p-target=0.001): 0.9989
+
 
 -----------------------------------------------------------------
 
@@ -23,3 +38,18 @@ EER: 38.64% Wed Nov 13 05:22:32 UTC 2019
 minDCF(p-target=0.01): 0.9995
 minDCF(p-target=0.001): 0.9995
 
+
+
+-----------------------------------------------------------------
+
+==== smallest_but_long_dataset,  djt_mfcc
+10시간걸림
+real    601m32.513s
+user    804m8.549s
+sys 187m36.802s
+
+EER: 44.08% Thu Nov 14 17:23:00 UTC 2019
+minDCF(p-target=0.01): 0.9992
+minDCF(p-target=0.001): 0.9992
+
+nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.smallest"
