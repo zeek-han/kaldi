@@ -125,8 +125,7 @@ echo stage_3   `date`
 if [ $stage -le 3 ]; then
   echo stage_3.1   `date`
   # Take a random subset of the augmentations
-  #utils/subset_data_dir.sh data/train_aug 1000000 data/train_aug_1m
-  utils/subset_data_dir.sh data/train_aug 1000 data/train_aug_1m
+  utils/subset_data_dir.sh data/train_aug 1000000 data/train_aug_1m
   utils/fix_data_dir.sh data/train_aug_1m
 
   echo stage_3.2  `date`

@@ -5,7 +5,7 @@ input_wav_dir=$2
 
 #echo $input_prefix
 
-djs_dir=./djs_dir/$(basename $input_wav_dir)
+djs_dir=/home/sangjik/djs_dir/$(basename $input_wav_dir)
 
 rm -rf $djs_dir 
 mkdir -p $djs_dir ./log
