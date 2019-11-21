@@ -66,6 +66,7 @@ if __name__ == '__main__':
     max_gpu_id = gpu_count() - 1
     gpu_id2wavs = defaultdict(list)
     i = 0
+    MAX_DURATION = 150
     for wav in wavs:
         utt_id = basename(wav[:-4])
         wav_len = len(AudioSegment.from_wav(wav))
@@ -75,7 +76,7 @@ if __name__ == '__main__':
         utt2dur[utt_id] = dur
         #utt_num_frames.append('{} {}'.format(utt_id, num_frames))
         utt2num_frames[utt_id] = num_frames
-        if dur < 150:
+        if dur < MAX_DURATION:
             i += 1
             gpu_id = min(int(i / num_wav_per_gpu), max_gpu_id)
             gpu_id2wavs[gpu_id].append(wav)
@@ -98,7 +99,7 @@ if __name__ == '__main__':
             p.map(this_resample, short_wavs, chunksize=5) 
     # long_wavs는 잘라서 넣어준다
     cutted_dir = p_join(djs_dir, 'long_wav.before_resampled')
-    cut_wav(long_wavs, cutted_dir, 150, 149)
+    cut_wav(long_wavs, cutted_dir, MAX_DURATION, 149)
     cutted_resampled_dir = p_join(djs_dir, 'long_wav')
     os.makedirs(cutted_resampled_dir, exist_ok=True)
     for cutted_wav in glob(p_join(cutted_dir, '*.wav')):
