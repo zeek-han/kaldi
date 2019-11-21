@@ -8,7 +8,7 @@ mkdir -p ./log
 
 ./make_mfcc_input_wav.py $input_scps $wav_dir	2>./log/make_mfcc_input_wav_err
 for wav_id_dir in `echo $wav_dir/$(basename $input_scps)*`; do
-    echo "BEFORE psf_mfcc: "$input_scps  - $wav_id_dir   
+    echo "BEFORE psf_mfcc: "$input_scps  - $wav_id_dir  : date-`date`
     #./psf_mfcc.py $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
     ./djt_mfcc.sh $input_scps $wav_id_dir   >"./log/djt_out_$(basename ${wav_id_dir})"  \
                                             2>"./log/djt_err_$(basename ${wav_id_dir})"

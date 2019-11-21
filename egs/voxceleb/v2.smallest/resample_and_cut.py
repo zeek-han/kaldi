@@ -62,7 +62,7 @@ if __name__ == '__main__':
     wavs = glob(p_join(input_wav_dir, '*.wav'))
     long_wavs = []
     #gpu_id = 0
-    num_wav_per_gpu = int(len(wavs) / gpu_count())
+    num_wav_per_gpu = max(int(len(wavs) / gpu_count()), 1)
     max_gpu_id = gpu_count() - 1
     gpu_id2wavs = defaultdict(list)
     i = 0
@@ -99,7 +99,7 @@ if __name__ == '__main__':
             p.map(this_resample, short_wavs, chunksize=5) 
     # long_wavs는 잘라서 넣어준다
     cutted_dir = p_join(djs_dir, 'long_wav.before_resampled')
-    cut_wav(long_wavs, cutted_dir, MAX_DURATION, 149)
+    cut_wav(long_wavs, cutted_dir, MAX_DURATION, MAX_DURATION - 1)
     cutted_resampled_dir = p_join(djs_dir, 'long_wav')
     os.makedirs(cutted_resampled_dir, exist_ok=True)
     for cutted_wav in glob(p_join(cutted_dir, '*.wav')):
