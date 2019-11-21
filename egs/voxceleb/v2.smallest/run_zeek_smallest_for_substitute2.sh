@@ -23,6 +23,7 @@ voxceleb1_root=$dataset_root/dataset/speech/English/vox_1_subset_smallest/
 voxceleb2_root=$dataset_root/dataset/speech/English/vox_2_subset_smallest/
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.smallest"
 musan_root=$dataset_root/dataset/sound/musan
+num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 
 stage=0
 echo stage 0  `date`
@@ -46,12 +47,12 @@ if [ $stage -le 1 ]; then
   # Make MFCCs and compute the energy-based VAD for each dataset
   mkdir -p mfcc_input_wav;
   for name in train voxceleb1_test; do
-    steps/make_mfcc_zeek_for_substitution2.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 8 --cmd "$train_cmd" \
+    steps/make_mfcc_zeek_for_substitution2.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj $num_cpu --cmd "$train_cmd" \
       data/${name} exp/make_mfcc $mfccdir
     echo stage1.0-make_mfcc_done_$name\t  `date`
     utils/fix_data_dir.sh data/${name}
     echo stage1.1-fix_data_done_$name    
-    sid/compute_vad_decision.sh --nj 8 --cmd "$train_cmd" \
+    sid/compute_vad_decision.sh --nj $num_cpu --cmd "$train_cmd" \
       data/${name} exp/make_vad $vaddir
     echo stage1.2-vad_decision_done_$name\t    `date`
     utils/fix_data_dir.sh data/${name}
@@ -128,7 +129,7 @@ if [ $stage -le 3 ]; then
   # Make MFCCs for the augmented data.  Note that we do not compute a new
   # vad.scp file here.  Instead, we use the vad.scp from the clean version of
   # the list.
-  steps/make_mfcc_zeek_for_substitution2.sh --mfcc-config conf/mfcc.conf --nj 8 --cmd "$train_cmd" \
+  steps/make_mfcc_zeek_for_substitution2.sh --mfcc-config conf/mfcc.conf --nj $num_cpu --cmd "$train_cmd" \
     data/train_aug_1m exp/make_mfcc $mfccdir
 
   echo stage_3.3  $(date)
@@ -143,7 +144,7 @@ if [ $stage -le 4 ]; then
   # This script applies CMVN and removes nonspeech frames.  Note that this is somewhat
   # wasteful, as it roughly doubles the amount of training data on disk.  After
   # creating training examples, this can be removed.
-  local/nnet3/xvector/prepare_feats_for_egs.sh --nj 8 --cmd "$train_cmd" \
+  local/nnet3/xvector/prepare_feats_for_egs.sh --nj $num_cpu --cmd "$train_cmd" \
     data/train_combined data/train_combined_no_sil exp/train_combined_no_sil
     echo stage_4.1  $(date)
   utils/fix_data_dir.sh data/train_combined_no_sil
@@ -188,13 +189,13 @@ local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
 if [ $stage -le 9 ]; then
   # Extract x-vectors for centering, LDA, and PLDA training.
   echo stage9.1  $(date)
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj 8 \
+  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
     $nnet_dir data/train \
     $nnet_dir/xvectors_train
 
   # Extract x-vectors used in the evaluation.
   echo stage9.2  $(date)
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj 8 \
+  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
     $nnet_dir data/voxceleb1_test \
     $nnet_dir/xvectors_voxceleb1_test
 fi
