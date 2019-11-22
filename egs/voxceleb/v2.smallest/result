@@ -4,7 +4,6 @@ EER: 3.293%
 minDCF(p-target=0.01): 0.3645
 minDCF(p-target=0.001): 0.5002
 
------------------------------------------------------------------
 ==== origianl dataset but aug_1thousand,                  (psf_mfcc, x-vector, TDNN)
 real    3756m38.636s
 user    14842m29.638s
@@ -27,7 +26,6 @@ minDCF(p-target=0.01): 0.9989
 minDCF(p-target=0.001): 0.9989
 
 
------------------------------------------------------------------
 
 ==== smallest_but_long_dataset,  psf_mfcc
 real    11m12.603s
@@ -40,8 +38,6 @@ minDCF(p-target=0.001): 0.9995
 
 
 
------------------------------------------------------------------
-
 ==== smallest_but_long_dataset,  djt_mfcc
 10시간걸림
 real    601m32.513s
@@ -53,3 +49,39 @@ minDCF(p-target=0.01): 0.9992
 minDCF(p-target=0.001): 0.9992
 
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.smallest"
+
+
+==== smallest_dataset,  djt_mfcc, g3.4xlarge( NVIDIA Tesla M60 GPU, 1개), nj=8
+13시간 걸림 -> 당사보유 GPU보다 다소 느린 듯 (2개로 6시간 걸렸었는데, 그건 djs_dir이 hdd였을껄)
+real    779m52.026s
+user    1257m30.363s
+sys 374m10.717s
+
+1 Iteration (실질적 0 iteration), nj=8
+EER: 43.8%
+minDCF(p-target=0.01): 0.9986
+minDCF(p-target=0.001): 0.9986
+
+
+
+
+-----------------------------------------------------------------
+
+==== subset_dataset,  djt_mfcc, 당사 GPU, nj=12(num_cpu)
+10시간 42분 걸림 
+
+epochs = 4 iterations (nj=12)
+EER: 27.11% Thu Nov 21 17:52:16 UTC 2019
+minDCF(p-target=0.01): 0.9820
+minDCF(p-target=0.001): 0.9820
+
+
+
+==== subset_dataset,  djt_mfcc, 당사 GPU, nj=8
+18시간 걸림
+
+1 Iteration (실질적 0 iteration), nj=8
+EER: 26.25% Wed Nov 20 03:56:38 UTC 2019
+minDCF(p-target=0.01): 0.9856
+minDCF(p-target=0.001): 0.9907
+ ->근데 좀 이상하긴 해. 4 itreation을 돌았을때보다 성능이 좋고, 되려 시간은 훨씬 감축되어 끝나다니
