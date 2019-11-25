@@ -23,7 +23,8 @@ voxceleb1_root=$dataset_root/dataset/speech/English/vox_1_subset/
 voxceleb2_root=$dataset_root/dataset/speech/English/vox_2_subset/
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.subset"
 musan_root=$dataset_root/dataset/sound/musan
-num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
+#num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
+num_cpu=16
 
 stage=0
 echo stage 0  `date`
@@ -122,7 +123,7 @@ if [ $stage -le 3 ]; then
   echo stage_3.1  $(date)
   # Take a random subset of the augmentations
   #utils/subset_data_dir.sh data/train_aug 1000000 data/train_aug_1m
-  utils/subset_data_dir.sh data/train_aug 1000 data/train_aug_1m
+  utils/subset_data_dir.sh data/train_aug 15000 data/train_aug_1m
   utils/fix_data_dir.sh data/train_aug_1m
 
   echo stage_3.2  $(date)

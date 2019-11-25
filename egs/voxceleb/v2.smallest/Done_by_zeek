@@ -2,8 +2,10 @@ go to src/ and do ./configure; make  ->for GPU usage. Unless do it, you would us
 
 nvidia-smi -c 3
 
+src/djtSystem   44:    gpuStackSize = 1024 * 128;       ->     gpuStackSize = 1024 * 64;
 
-�일단 기억나는대로 쓴다
+
+??일단 기억나는대로 쓴다
 
 run.sh 80: cp data/train/vad.scp data/train_reverb/ 에 -f flag를 더해준다
 

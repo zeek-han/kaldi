@@ -77,6 +77,7 @@ fi
 #  for name in train voxceleb1_test; do
 #    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 40 --cmd "$train_cmd" \
 #      data/${name} exp/make_mfcc $mfccdir
+#########steps/make_mfcc.sh를 하면 ./mfcc에 raw_mfcc_${name}.scp와 .ark가 생긴다.  이게 바로 mfcc
 #    utils/fix_data_dir.sh data/${name}
 #    sid/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
 #      data/${name} exp/make_vad $vaddir
@@ -152,6 +153,7 @@ fi
 #  # Combine the clean and augmented VoxCeleb2 list.  This is now roughly
 #  # double the size of the original clean list.
 #  utils/combine_data.sh data/train_combined data/train_aug_1m data/train
+###여기까지 하면 data/train_combined가 생성됨
 #fi
 #
 ## Now we prepare the features to generate examples for xvector training.
@@ -161,6 +163,7 @@ fi
 #  # creating training examples, this can be removed.
 #  local/nnet3/xvector/prepare_feats_for_egs.sh --nj 40 --cmd "$train_cmd" \
 #    data/train_combined data/train_combined_no_sil exp/train_combined_no_sil
+###위에 prepare_feats_for_egs.sh는 data/train_combined를 input으로 하고 data/train_combined_no_sil과 exp/블라블라를 생성함
 #  utils/fix_data_dir.sh data/train_combined_no_sil
 #fi
 #
