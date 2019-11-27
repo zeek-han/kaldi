@@ -65,7 +65,7 @@ minDCF(p-target=0.001): 0.9986
 
 
 
-==== smallest_dataset,  djt_mfcc, p2.xlarge( NVIDIA 무엇인지 나중에 확인 1개), nj=4
+==== smallest_dataset,  djt_mfcc, p2.xlarge( NVIDIA K80, GPU 1개), nj=4
 그냥 끔, 근데 train뿐 아니라 vox1_test까지 stage 1끝내는데 20시간 걸림  -_-;;
 
 -----------------------------------------------------------------
@@ -85,7 +85,7 @@ minDCF(p-target=0.001): 0.9958
 
 
 
-==== subset_dataset,  djt_mfcc, 당사 GPU, nj=12(num_cpu)
+==== subset_dataset,  djt_mfcc, 당사 GPU 2개, nj=12(num_cpu)
 10시간 42분 걸림 
 
 epochs = 4 iterations (nj=12)
@@ -95,18 +95,18 @@ minDCF(p-target=0.001): 0.9820
 
 
 
-==== subset_dataset,  djt_mfcc, 당사 GPU, nj=8
+==== subset_dataset,  djt_mfcc, 당사 GPU 2개, nj=8
 18시간 걸림
 
 1 Iteration (실질적 0 iteration), nj=8
 EER: 26.25% Wed Nov 20 03:56:38 UTC 2019
 minDCF(p-target=0.01): 0.9856
 minDCF(p-target=0.001): 0.9907
- ->근데 좀 이상하긴 해. 4 itreation을 돌았을때보다 성능이 좋고, 되려 시간은 훨씬 감축되어 끝나다니
+ ->근데 좀 이상하긴 해. 4 itreation을 돌았을때보다 성능이 좋은데..
  (아마 augmentation이 15000인가부다, 딴애들은 1000이었구)
 
 
-==== subset_dataset with 1000 aug,  djt_mfcc, aws p3.2xlarge, nj=16
+==== subset_dataset with 1000 aug,  djt_mfcc, aws g3.4xlarge(TESLA M60 1개), nj=16
 35시간 걸림.
 
 real    2144m37.069s
@@ -117,4 +117,13 @@ epochs = 4 iterations (nj=16) : 한번 iteration에서 1분가량 소요
 EER: 26.99% Mon Nov 25 03:01:34 UTC 2019
 minDCF(p-target=0.01): 0.9733
 minDCF(p-target=0.001): 0.9748
+
+
+==== subset_dataset with 15000 aug,  djt_mfcc, aws p3.8xlarge(TESLA V100 4개), nj=32
+10.5시간 걸림
+
+Training will run for 3.0 epochs = 7 iterations (nj=32) : 한번 iteration에서 6~7초가량 소요
+EER: 26.37% Mon Nov 25 18:40:54 UTC 2019
+minDCF(p-target=0.01): 0.9750
+minDCF(p-target=0.001): 0.9799
 
