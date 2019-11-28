@@ -15,7 +15,7 @@ import librosa
 import soundfile as sf
 
 def resample(wav, new_wav_dir='./'):
-    target_sampling_rate = 384000
+    target_sampling_rate = 48000
     data, sample_rate = sf.read(wav)
     output_path = p_join(new_wav_dir, basename(wav))
     if sample_rate != target_sampling_rate:
@@ -27,7 +27,7 @@ def resample(wav, new_wav_dir='./'):
 
 def gpu_count():
     with tempfile.NamedTemporaryFile() as tmp_fd:
-        os.system("nvidia-smi | grep +-------------------------------+----------------------+----------------------+ | wc -l >{}".format(tmp_fd.name))
+        os.system("nvidia-smi -L | wc -l >{}".format(tmp_fd.name))
         with open(tmp_fd.name, 'r') as fd:
             for line in fd:
                 num_gpu = int(line[:-1])
@@ -52,28 +52,32 @@ def cut_wav(long_wavs, output_dir, window_size, stride):
 if __name__ == '__main__':
     input_prefix = sys.argv[1]
     input_wav_dir = sys.argv[2]
-    djs_dir = sys.argv[3]
-    num_of_wav_chunk = int(sys.argv[4])
-   
+    djs_dir_prefix = sys.argv[3]
+    djs_dir_suffix = sys.argv[4]
+    cutted_root_dir = sys.argv[5]
+    num_of_wav_chunk = int(sys.argv[6])
+    
+      
     num = input_wav_dir.split('.')[-1] 
     utt2dur_path = p_join(dirname(input_prefix), 'utt2dur.' + num)
     utt2num_frames_path = p_join(dirname(input_prefix), 'utt2num_frames.' + num)
    
-    #utt_durs = [] 
-    #utt_num_frames = []
     utt2dur = {}
     utt2num_frames = {}
     wavs = sorted(glob(p_join(input_wav_dir, '*.wav')))
     long_wavs = []
-    #gpu_id = 0
-    num_wav_per_chunk = max(int(len(wavs) / num_of_wav_chunk), 1)
-    num_wav_per_gpu = max(int(num_wav_per_chunk / gpu_count()), 1)
-    max_chunk_id = num_of_wav_chunk - 1
+
+    #num_wav_per_chunk = max(int(len(wavs) / num_of_wav_chunk), 1)
+    #num_wav_per_gpu = max(int(num_wav_per_chunk / gpu_count()), 1)
+    num_wav_per_gpu = max(int(len(wavs) / gpu_count()), 1)
+    num_wav_per_chunk = max(int(num_wav_per_gpu / num_of_wav_chunk), 1)
+
     max_gpu_id = gpu_count() - 1
+    max_chunk_id = num_of_wav_chunk - 1
     gpu_id2wavs = defaultdict(list)
     i = 0
-    pre_chunk_id = -1
-    num_wav_in_this_chunk = 0
+    pre_gpu_id = -1
+    num_wav_in_this_gpu = 0
     MAX_DURATION = 65
     for wav in wavs:
         utt_id = basename(wav[:-4])
@@ -86,13 +90,13 @@ if __name__ == '__main__':
         utt2num_frames[utt_id] = num_frames
         if dur < MAX_DURATION:
             i += 1
-            wav_chunk_id = min(int(i / num_wav_per_chunk), max_chunk_id)
-            if pre_chunk_id != wav_chunk_id:
-                num_wav_in_this_chunk = 0
-                pre_chunk_id = wav_chunk_id
-            num_wav_in_this_chunk += 1
-            gpu_id = min(int(num_wav_in_this_chunk / num_wav_per_gpu), max_gpu_id)
-            gpu_id2wavs[(wav_chunk_id, gpu_id)].append(wav)
+            gpu_id = min(int(i / num_wav_per_gpu), max_gpu_id)
+            if pre_gpu_id != gpu_id:
+                num_wav_in_this_gpu = 0
+                pre_gpu_id = gpu_id
+            num_wav_in_this_gpu += 1
+            wav_chunk_id = min(int(num_wav_in_this_gpu / num_wav_per_chunk), max_chunk_id)
+            gpu_id2wavs[(gpu_id, wav_chunk_id)].append(wav)
         else:
             long_wavs.append(wav)
 
@@ -101,19 +105,20 @@ if __name__ == '__main__':
     with open(utt2num_frames_path, 'w') as fd2:
         print('\n'.join(['{} {}'.format(k, v) for (k, v) in utt2num_frames.items()]), file=fd2)
 
-    for (wav_chunk_id, gpu_id), short_wavs in gpu_id2wavs.items():
-        print((wav_chunk_id, gpu_id))
-    for (wav_chunk_id, gpu_id), short_wavs in gpu_id2wavs.items():
-        resampled_dir = p_join(djs_dir, 'chunk_{}'.format(wav_chunk_id), 'gpu_{}'.format(gpu_id))
+    #for (gpu_id, wav_chunk_id), short_wavs in gpu_id2wavs.items():
+    #    print((gpu_id, wav_chunk_id))
+    for (gpu_id, wav_chunk_id), short_wavs in gpu_id2wavs.items():
+        resampled_dir = p_join('{}_{}'.format(djs_dir_prefix, gpu_id), 
+                               djs_dir_suffix, 'chunk_{}'.format(wav_chunk_id))
         os.makedirs(resampled_dir, exist_ok=True)
         this_resample = partial(resample, new_wav_dir=resampled_dir)
         num_of_cpus = cpu_count()
         with Pool(num_of_cpus, maxtasksperchild=20) as p:
-            p.map(this_resample, short_wavs, chunksize=5) 
+            p.map(this_resample, short_wavs, chunksize=1) 
     # long_wavs는 잘라서 넣어준다
-    cutted_dir = p_join(djs_dir, 'long_wav.before_resampled')
+    cutted_dir = p_join(cutted_root_dir, 'long_wav.before_resampled')
     cut_wav(long_wavs, cutted_dir, MAX_DURATION, MAX_DURATION - 1)
-    cutted_resampled_dir = p_join(djs_dir, 'long_wav')
+    cutted_resampled_dir = p_join(cutted_root_dir, 'long_wav')
     os.makedirs(cutted_resampled_dir, exist_ok=True)
     for cutted_wav in glob(p_join(cutted_dir, '*.wav')):
         resample(cutted_wav, cutted_resampled_dir)
