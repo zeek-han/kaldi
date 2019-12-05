@@ -16,55 +16,39 @@ vaddir=`pwd`/mfcc
 
 
 # The trials file is downloaded by local/make_voxceleb1_v2.pl.
-dataset_root="/media/sangjik/hdd2"
 voxceleb1_trials=data/voxceleb1_test/trials
-voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
-voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
-nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.total_dataset_djt"
-musan_root=$dataset_root/dataset/sound/musan
-num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
+voxceleb1_root=/media/sangjik/hdd2/dataset/speech/English/VoxCeleb1
+voxceleb2_root=/media/sangjik/hdd2/dataset/speech/English/VoxCeleb2
+nnet_dir="/media/sangjik/hdd2/speaker_verification/kaldi/xvector_nnet_1a"
+musan_root=/media/sangjik/hdd2/dataset/sound/musan
 
 stage=0
-echo stage 0 `date`
-rm -rf ./data ./mfcc_input_wav;
-if [ $stage -le 0 ]; then
-  #local/make_voxceleb2.pl $voxceleb2_root dev data/voxceleb2_train
-  #local/make_voxceleb2.pl $voxceleb2_root test data/voxceleb2_test
-  # This script creates data/voxceleb1_test and data/voxceleb1_train for latest version of VoxCeleb1.
-  # Our evaluation set is the test portion of VoxCeleb1.
-  local/make_voxceleb1_v2.pl $voxceleb1_root dev data/voxceleb1_train
-  local/make_voxceleb1_v2.pl $voxceleb1_root test data/voxceleb1_test
-  # if you downloaded the dataset soon after it was released, you will want to use the make_voxceleb1.pl script instead.
-  # local/make_voxceleb1.pl $voxceleb1_root data
-  # We'll train on all of VoxCeleb2, plus the training portion of VoxCeleb1.
-  # This should give 7,323 speakers and 1,276,888 utterances.
-  utils/combine_data.sh data/train  data/voxceleb1_train
-  #utils/combine_data.sh data/train data/voxceleb2_train data/voxceleb2_test data/voxceleb1_train
-fi
 
-echo stage1   `date`
+#if [ $stage -le 0 ]; then
+#  local/make_voxceleb2.pl $voxceleb2_root dev data/voxceleb2_train
+#  local/make_voxceleb2.pl $voxceleb2_root test data/voxceleb2_test
+#  # This script creates data/voxceleb1_test and data/voxceleb1_train for latest version of VoxCeleb1.
+#  # Our evaluation set is the test portion of VoxCeleb1.
+#  local/make_voxceleb1_v2.pl $voxceleb1_root dev data/voxceleb1_train
+#  local/make_voxceleb1_v2.pl $voxceleb1_root test data/voxceleb1_test
+#  # if you downloaded the dataset soon after it was released, you will want to use the make_voxceleb1.pl script instead.
+#  # local/make_voxceleb1.pl $voxceleb1_root data
+#  # We'll train on all of VoxCeleb2, plus the training portion of VoxCeleb1.
+#  # This should give 7,323 speakers and 1,276,888 utterances.
+#  utils/combine_data.sh data/train data/voxceleb2_train data/voxceleb2_test data/voxceleb1_train
+#fi
+
 if [ $stage -le 1 ]; then
   # Make MFCCs and compute the energy-based VAD for each dataset
-  mkdir -p mfcc_input_wav;
   for name in train voxceleb1_test; do
-    steps/make_mfcc_zeek_for_substitution2.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj $num_cpu --cmd "$train_cmd" \
+    steps/make_mfcc_zeek.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 40 --cmd "$train_cmd" \
       data/${name} exp/make_mfcc $mfccdir
-    echo stage1.0-make_mfcc_done_$name   `date`
-
     utils/fix_data_dir.sh data/${name}
-    echo stage1.1-fix_data_done_$name   `date`
-
-    sid/compute_vad_decision.sh --nj $num_cpu --cmd "$train_cmd" \
+    sid/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
       data/${name} exp/make_vad $vaddir
-    echo stage1.2-vad_decision_done_$name   `date`
-
     utils/fix_data_dir.sh data/${name}
-    echo stage1.3-fix_data_done_$name   `date`
-
   done
 fi
-
-echo stage2   `date`
 
 # In this section, we augment the VoxCeleb2 data with reverberation,
 # noise, music, and babble, and combine it with the clean data.
@@ -74,9 +58,7 @@ if [ $stage -le 2 ]; then
 
   if [ ! -d "RIRS_NOISES" ]; then
     # Download the package that includes the real RIRs, simulated RIRs, isotropic noises and point-source noises
-    if [ ! -f "rirs_noises.zip" ]; then
-        wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
-    fi
+    wget --no-check-certificate http://www.openslr.org/resources/28/rirs_noises.zip
     unzip rirs_noises.zip
   fi
 
@@ -122,49 +104,40 @@ if [ $stage -le 2 ]; then
   utils/combine_data.sh data/train_aug data/train_reverb data/train_noise data/train_music data/train_babble
 fi
 
-echo stage_3   `date`
 if [ $stage -le 3 ]; then
-  echo stage_3.1   `date`
   # Take a random subset of the augmentations
-  utils/subset_data_dir.sh data/train_aug 100000 data/train_aug_1m
+  utils/subset_data_dir.sh data/train_aug 1000000 data/train_aug_1m
   utils/fix_data_dir.sh data/train_aug_1m
 
-  echo stage_3.2  `date`
   # Make MFCCs for the augmented data.  Note that we do not compute a new
   # vad.scp file here.  Instead, we use the vad.scp from the clean version of
   # the list.
-  steps/make_mfcc_zeek_for_substitution2.sh --mfcc-config conf/mfcc.conf --nj $num_cpu --cmd "$train_cmd" \
+  steps/make_mfcc_zeek.sh --mfcc-config conf/mfcc.conf --nj 40 --cmd "$train_cmd" \
     data/train_aug_1m exp/make_mfcc $mfccdir
 
-  echo stage_3.3  `date`
   # Combine the clean and augmented VoxCeleb2 list.  This is now roughly
   # double the size of the original clean list.
   utils/combine_data.sh data/train_combined data/train_aug_1m data/train
 fi
 
-echo stage_4  `date`
 # Now we prepare the features to generate examples for xvector training.
 if [ $stage -le 4 ]; then
   # This script applies CMVN and removes nonspeech frames.  Note that this is somewhat
   # wasteful, as it roughly doubles the amount of training data on disk.  After
   # creating training examples, this can be removed.
-  local/nnet3/xvector/prepare_feats_for_egs.sh --nj $num_cpu --cmd "$train_cmd" \
+  local/nnet3/xvector/prepare_feats_for_egs.sh --nj 40 --cmd "$train_cmd" \
     data/train_combined data/train_combined_no_sil exp/train_combined_no_sil
-    echo stage_4.1  `date`
   utils/fix_data_dir.sh data/train_combined_no_sil
 fi
 
-echo stage_5  `date`
 if [ $stage -le 5 ]; then
   # Now, we need to remove features that are too short after removing silence
   # frames.  We want atleast 5s (500 frames) per utterance.
   min_len=400
   mv data/train_combined_no_sil/utt2num_frames data/train_combined_no_sil/utt2num_frames.bak
   awk -v min_len=${min_len} '$2 > min_len {print $1, $2}' data/train_combined_no_sil/utt2num_frames.bak > data/train_combined_no_sil/utt2num_frames
-  echo stage_5.1  `date`
   utils/filter_scp.pl data/train_combined_no_sil/utt2num_frames data/train_combined_no_sil/utt2spk > data/train_combined_no_sil/utt2spk.new
   mv data/train_combined_no_sil/utt2spk.new data/train_combined_no_sil/utt2spk
-  echo stage_5.2  `date`
   utils/fix_data_dir.sh data/train_combined_no_sil
 
   # We also want several utterances per speaker. Now we'll throw out speakers
@@ -175,31 +148,28 @@ if [ $stage -le 5 ]; then
   mv data/train_combined_no_sil/spk2utt.new data/train_combined_no_sil/spk2utt
   utils/spk2utt_to_utt2spk.pl data/train_combined_no_sil/spk2utt > data/train_combined_no_sil/utt2spk
 
-  echo stage_5.3  `date`
   utils/filter_scp.pl data/train_combined_no_sil/utt2spk data/train_combined_no_sil/utt2num_frames > data/train_combined_no_sil/utt2num_frames.new
   mv data/train_combined_no_sil/utt2num_frames.new data/train_combined_no_sil/utt2num_frames
 
-  echo stage_5.4  `date`
   # Now we're ready to create training examples.
   utils/fix_data_dir.sh data/train_combined_no_sil
-  echo stage_5.5  `date`
 fi
 
 # Stages 6 through 8 are handled in run_xvector.sh
-local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
+local/nnet3/xvector/run_xvector.sh --stage $stage --train-stage -1 \
   --data data/train_combined_no_sil --nnet-dir $nnet_dir \
   --egs-dir $nnet_dir/egs
 
 if [ $stage -le 9 ]; then
   # Extract x-vectors for centering, LDA, and PLDA training.
-  echo stage9.1  `date`
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  echo stage9.1
+  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj 20 \
     $nnet_dir data/train \
     $nnet_dir/xvectors_train
 
   # Extract x-vectors used in the evaluation.
-  echo stage9.2  `date`
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  echo stage9.2
+  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj 10 \
     $nnet_dir data/voxceleb1_test \
     $nnet_dir/xvectors_voxceleb1_test
 fi
@@ -237,7 +207,7 @@ if [ $stage -le 12 ]; then
   eer=`compute-eer <(local/prepare_for_eer.py $voxceleb1_trials exp/scores_voxceleb1_test) 2> /dev/null`
   mindcf1=`sid/compute_min_dcf.py --p-target 0.01 exp/scores_voxceleb1_test $voxceleb1_trials 2> /dev/null`
   mindcf2=`sid/compute_min_dcf.py --p-target 0.001 exp/scores_voxceleb1_test $voxceleb1_trials 2> /dev/null`
-  echo "EER: $eer%"   `date`
+  echo "EER: $eer%"
   echo "minDCF(p-target=0.01): $mindcf1"
   echo "minDCF(p-target=0.001): $mindcf2"
   # EER: 3.128%

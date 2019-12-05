@@ -16,8 +16,8 @@ vaddir=`pwd`/mfcc
 
 
 # The trials file is downloaded by local/make_voxceleb1_v2.pl.
-#dataset_root="/media/sangjik/hdd2"
-dataset_root="/home/sangjik"
+dataset_root="/media/sangjik/hdd2"
+#dataset_root="/home/sangjik"
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=$dataset_root/dataset/speech/English/vox_1_subset_smallest/
 voxceleb2_root=$dataset_root/dataset/speech/English/vox_2_subset_smallest/
@@ -117,7 +117,7 @@ if [ $stage -le 3 ]; then
   # Make MFCCs for the augmented data.  Note that we do not compute a new
   # vad.scp file here.  Instead, we use the vad.scp from the clean version of
   # the list.
-  steps/make_mfcc_zeek.sh --mfcc-config conf/mfcc.conf --nj 4 --cmd "$train_cmd" \
+  steps/make_mfcc_zeek.sh --mfcc-config conf/mfcc.conf --nj 8 --cmd "$train_cmd" \
     data/train_aug_1m exp/make_mfcc $mfccdir
 
   ## Combine the clean and augmented VoxCeleb2 list.  This is now roughly

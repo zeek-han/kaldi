@@ -1,0 +1,15 @@
+
+ 1. resample어쩌구.py에서 multiprocessing을 할때, 20, 5를 주고 있는데, 64개cpu에서 wav의 개수가 250여개정도밖에 안되다 보니 노는놈이 생김
+ chunksize를 2로 줄여야할 듯 싶다
+ 125개로 실험해보니, (wav_chunk=20이면 125개) chunk_size는 1이나 2나 둘다 20초. 심지어 3으로 해서 CPU가 max 60%여도 20초, 5이면 25초(cpu20%)
+-----모두 384k로 resample할때였고
+이제는 48k로 resample해보니
+125개로, chunksize=1 -> 4.65sec
+         chunksize=5 -> 5.56sec
+ ---------------------------------
+ 근데 print 문이 있으니까 이걸 redirection으로 file에 쓰면
+         chunksize=5 -> 5.368sec
+ 아예 print문을 지우면..별차이안남
+         
+ 
+ 2. long_wav도 djt를 할때 1개의 gpu가 하지 않게 여러개가 하게 할 수 있다

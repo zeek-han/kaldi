@@ -1,0 +1,119 @@
+steps/nnet3/train_raw_dnn.py
+
+319     # set num_iters so that as close as possible, we process the data
+320     # $num_epochs times, i.e. $num_iters*$avg_num_jobs) ==
+321     # $num_epochs*$num_archives, where
+322     # avg_num_jobs=(num_jobs_initial+num_jobs_final)/2.
+
+323     num_archives_expanded = num_archives * args.frames_per_eg
+324     num_archives_to_process = int(args.num_epochs * num_archives_expanded)
+325     num_archives_processed = 0
+326     num_iters = int((num_archives_to_process * 2) / (args.num_jobs_initial + args.num_jobs_final))
+
+num_iters가 그 값이다.
+의심스러우면 맨밑에 코드를 보자
+
+323: args.frames_per_eg 는   argument로 받는 --egs.frames-per-eg=1                          즉, 1이다.
+324: args.num_epochs는       argument로 받는 --trainer.num-epochs=3                         즉, 3이다.
+325: 버리는 줄이고
+326: args.num_jobs_initial는 argument로 받는 --trainer.optimization.num-jobs-initial=3      즉, 3이다
+   : args.num_jobs_final는   argument로 받는 --trainer.optimization.num-jobs-final=8        즉, 8이다
+
+대입하면
+323     num_archives_expanded = num_archives * 1
+324     num_archives_to_process = int(3 * num_archives_expanded)
+325
+326     num_iters = int((num_archives_to_process * 2) / (3 + 8))
+
+다시 정리하면
+
+326     num_iters = int(( int(3 * num_archives * 1) * 2) / (3 + 8))
+즉,
+326     num_iters = int(( int(3 * num_archives) * 2) / 11)
+
+
+그러면 num_archives가 중요한데, 위에 보면 다음이 나온다
+291     [egs_left_context, egs_right_context,
+292      frames_per_eg_str, num_archives] = (
+293          common_train_lib.verify_egs_dir(egs_dir, feat_dim,
+294                                          ivector_dim, ivector_id,
+295                                          left_context, right_context))
+
+common_train_lib은 kaldi/egs/wsj/s5/steps/libs/nnet3/train/common.py 을 뜻한다.
+egs_dir이 중요한데, egs_dir은 run.sh 맨위에서 설정하는 $nnet_dir/egs 이다.
+그래서 kaldi/egs/wsj/s5/steps/libs/nnet3/train/common.py 안에 보면
+
+394 def verify_egs_dir(egs_dir, feat_dim, ivector_dim, ivector_extractor_id,
+395                    left_context, right_context,
+396                    left_context_initial=-1, right_context_final=-1):
+
+이렇게 함수가 있고, 그 밑에 보면
+
+484         num_archives = int(open('{0}/info/num_archives'.format(
+485                                     egs_dir)).readline())
+
+이렇게 나온다.
+즉, num_archives는 $nnet_dir/egs/info/num_archives 파일에 적혀있는 값이다.
+$nnet_dir/egs/info/num_archives 파일은 언제 어디에서 생성하냐면,
+$nnet_dir자체를 stage 6인 sid/nnet3/xvector/get_egs.sh 가 생성한다.
+
+sid/nnet3/xvector/get_egs.sh에서 어디가 num_archives를 쓰는지 보면 다음과 같다.
+
+124 # first for the training data... work out how many archives.
+125 num_train_frames=$(awk '{n += $2} END{print n}' <$temp/utt2num_frames.train)
+126 num_train_subset_frames=$(awk '{n += $2} END{print n}' <$temp/utt2num_frames.train_subset)
+127 
+128 echo $num_train_frames >$dir/info/num_frames
+129 num_train_archives=$[($num_train_frames*$num_repeats)/$frames_per_iter + 1]
+130 echo "$0: Producing $num_train_archives archives for training"
+131 echo $num_train_archives > $dir/info/num_archives
+
+
+
+
+
+
+
+num_iters가 우리가 원하는 변수라는 것을 알수 있는 코드:
+아래의 356줄과 393줄을 보면 바로 알 수 있다.
+
+356     for iter in range(num_iters):
+357         if (args.exit_stage is not None) and (iter == args.exit_stage):
+358             logger.info("Exiting early due to --exit-stage {0}".format(iter))
+359             return
+360 
+361         current_num_jobs = common_train_lib.get_current_num_jobs(
+362             iter, num_iters,
+363             args.num_jobs_initial, args.num_jobs_step, args.num_jobs_final)
+364 
+365         if args.stage <= iter:
+366             lrate = common_train_lib.get_learning_rate(iter, current_num_jobs,
+367                                                        num_iters,
+368                                                        num_archives_processed,
+369                                                        num_archives_to_process,
+370                                                        args.initial_effective_lrate,
+371                                                        args.final_effective_lrate)
+372 
+373             shrinkage_value = 1.0 - (args.proportional_shrink * lrate)
+374             if shrinkage_value <= 0.5:
+375                 raise Exception("proportional-shrink={0} is too large, it gives "
+376                                 "shrink-value={1}".format(args.proportional_shrink,
+377                                                           shrinkage_value))
+378 
+379             percent = num_archives_processed * 100.0 / num_archives_to_process
+380             epoch = (num_archives_processed * args.num_epochs
+381                      / num_archives_to_process)
+382             shrink_info_str = ''
+383             if shrinkage_value != 1.0:
+384                 shrink_info_str = 'shrink: {0:0.5f}'.format(shrinkage_value)
+385             logger.info("Iter: {0}/{1}   Jobs: {2}   "
+386                         "Epoch: {3:0.2f}/{4:0.1f} ({5:0.1f}% complete)   "
+387                         "lr: {6:0.6f}   {7}".format(iter, num_iters - 1,
+388                                                     current_num_jobs,
+389                                                     epoch, args.num_epochs,
+390                                                     percent,
+391                                                     lrate, shrink_info_str))
+392 
+393             train_lib.common.train_one_iteration(
+
+
