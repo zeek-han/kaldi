@@ -20,7 +20,7 @@ dataset_root="/media/sangjik/hdd2"
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
 voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
-nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_djt"
+nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_djt"
 musan_root=$dataset_root/dataset/sound/musan
 num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 
@@ -28,6 +28,7 @@ stage=0
 #echo stage 0 `date`
 #rm -rf ./data ./mfcc_input_wav;
 #if [ $stage -le 0 ]; then
+#  #아래 2줄 지우고
 #  #local/make_voxceleb2.pl $voxceleb2_root dev data/voxceleb2_train
 #  #local/make_voxceleb2.pl $voxceleb2_root test data/voxceleb2_test
 #  # This script creates data/voxceleb1_test and data/voxceleb1_train for latest version of VoxCeleb1.
@@ -40,6 +41,7 @@ stage=0
 #  # This should give 7,323 speakers and 1,276,888 utterances.
 #  utils/combine_data.sh data/train  data/voxceleb1_train
 #  #utils/combine_data.sh data/train data/voxceleb2_train data/voxceleb2_test data/voxceleb1_train
+#  #위에 한줄 고치고
 #fi
 #
 #echo stage1   `date`

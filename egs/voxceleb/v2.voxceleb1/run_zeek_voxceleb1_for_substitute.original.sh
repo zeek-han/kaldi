@@ -20,7 +20,7 @@ dataset_root="/media/sangjik/hdd2"
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
 voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
-nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.total_dataset_djt"
+nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_djt"
 musan_root=$dataset_root/dataset/sound/musan
 num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 

@@ -1,3 +1,7 @@
+voxceleb1 dataset에 대해서, num_archive값이 24같아서 
+num_iteration = 3 * 24 * 2 / 11 = 13일 것 같은데, 이상하게 35를 하더라.
+왜그러지?? -_-;;;
+######################################
 steps/nnet3/train_raw_dnn.py
 
 319     # set num_iters so that as close as possible, we process the data
