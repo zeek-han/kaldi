@@ -1,10 +1,26 @@
-아무것도 안했을때, 기본대로 그냥 돌림   (kaldi_mfcc, x-vector, TDNN)
+
+==== origianl dataset everything defualt    (kaldi_mfcc, x-vector, TDNN, p3.16xlarge, v100 8대)
+18시간 40분 소요
+real	1120m46.335s
+user	29402m59.201s
+sys	4760m16.842s
+
+EER: 3.234%
+minDCF(p-target=0.01): 0.3637
+minDCF(p-target=0.001): 0.4783
+
+그래두 주석에 있는 3.128은 안나오네 
+num_Iter : 44
+
+
+==== origianl dataset everything defualt    (kaldi_mfcc, x-vector, TDNN, local_PC, nj=12)
+아무것도 안했을때, 기본대로 그냥 돌림       (kaldi_mfcc, x-vector, TDNN, local_PC, nj=12)
 약 3일 걸림
 EER: 3.293%
 minDCF(p-target=0.01): 0.3645
 minDCF(p-target=0.001): 0.5002
 
-==== origianl dataset but aug_1thousand,                  (psf_mfcc, x-vector, TDNN)
+==== origianl dataset but aug_1thousand,                  (psf_mfcc, x-vector, TDNN, local_PC)
 real    3756m38.636s
 user    14842m29.638s
 sys 5547m48.884s
@@ -127,3 +143,48 @@ EER: 26.37% Mon Nov 25 18:40:54 UTC 2019
 minDCF(p-target=0.01): 0.9750
 minDCF(p-target=0.001): 0.9799
 
+
+------------------------------------------
+
+==== VoxCeleb1 with 100,000 aug, psf_mfcc, local_PC, nj=num_cpu(==12)
+8시간 걸림
+
+root@6b03569c7231:/media/sangjik/hdd1/zeek_github/ASR/kaldi/egs/voxceleb/v2.voxceleb1# time ./run_zeek_voxceleb1_for_substitute.original.sh >stdout_psf 2>stderr_psf
+
+real    474m59.906s
+user    2586m23.670s
+sys     1222m10.419s
+
+EER: 6.803% Fri Dec 6 18:54:05 UTC 2019
+minDCF(p-target=0.01): 0.5775
+minDCF(p-target=0.001): 0.6913
+
+
+
+
+==== VoxCeleb1 with 100,000 aug, kaldi default, local_PC, nj=num_cpu(==12)
+4시간 걸림
+
+root@6b03569c7231:/media/sangjik/hdd1/zeek_github/ASR/kaldi/egs/voxceleb/v2.voxceleb1# time ./run_zeek_voxceleb1.sh >stdout_kaldidefatul 2>stderr_kaldidefault
+  
+  real  246m19.046s
+  user  2069m10.737s
+  sys   229m32.161s
+
+EER: 6.84%
+minDCF(p-target=0.01): 0.5477
+minDCF(p-target=0.001): 0.6572
+
+
+
+==== VoxCeleb1 with 100,000 aug, djt_mfcc, p3.x16large(v100 * 8), nj=40
+41시간 걸림
+
+root@68c92890a1f1:/home/sangjik/kaldi/egs/voxceleb/v2.voxceleb1# time ./run_zeek_voxceleb1_for_substitute.original.sh >stdout_voxceleb1 2>stderr_voxceleb1
+real	2475m47.397s
+user	20521m3.830s
+sys	    23421m0.285s
+
+EER: 12.4% Mon Dec 9 23:48:24 UTC 2019
+minDCF(p-target=0.01): 0.7751
+minDCF(p-target=0.001): 0.8674

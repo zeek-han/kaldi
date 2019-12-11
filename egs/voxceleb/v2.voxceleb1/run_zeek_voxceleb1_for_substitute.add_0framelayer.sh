@@ -186,7 +186,8 @@ if [ $stage -le 5 ]; then
 fi
 
 # Stages 6 through 8 are handled in run_xvector.sh
-local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
+#local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
+local/nnet3/xvector/run_xvector.add_0framelayer.sh --stage $stage --train-stage -1 \
   --data data/train_combined_no_sil --nnet-dir $nnet_dir \
   --egs-dir $nnet_dir/egs
 
