@@ -28,7 +28,7 @@ def extract_mfcc(name):
     return utt_id2mfcc
 
 def rewrite(name):
-    mfcc_dir = './mfcc'
+    mfcc_dir = './mfcc.rewrite'
     os.makedirs(mfcc_dir, exist_ok=True)
     with open(name + '.json', 'r') as fp:
         utt_id2mfcc = json.load(fp)
@@ -48,6 +48,7 @@ def rewrite(name):
                     mfcc_npy = utt_id2mfcc[utt_id]
                     writer[utt_id] = np.load(mfcc_npy)
                 except KeyError:
+                    writer[utt_id] = np.load(p_join('./tmp_wav', utt_id + '.npy'))
                     print('KeyError:', utt_id)
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ vaddir=`pwd`/mfcc
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=/media/sangjik/hdd2/dataset/speech/English/VoxCeleb1
 voxceleb2_root=/media/sangjik/hdd2/dataset/speech/English/VoxCeleb2
-nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_kaldidefault"
+nnet_dir="/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_kaldidefault_aug100"
 musan_root=/media/sangjik/hdd2/dataset/sound/musan
 num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 
@@ -110,7 +110,7 @@ fi
 echo stage 3
 if [ $stage -le 3 ]; then
   # Take a random subset of the augmentations
-  utils/subset_data_dir.sh data/train_aug 100000 data/train_aug_1m
+  utils/subset_data_dir.sh data/train_aug 100 data/train_aug_1m
   utils/fix_data_dir.sh data/train_aug_1m
 
   # Make MFCCs for the augmented data.  Note that we do not compute a new
