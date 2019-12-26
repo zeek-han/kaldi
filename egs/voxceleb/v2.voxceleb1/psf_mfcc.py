@@ -39,10 +39,6 @@ if __name__ == '__main__':
         sr, samples = wav_file.read(wav)
         psf_mfcc_feat = psf_mfcc(samples, numcep=30, nfilt=30, nfft=640, lowfreq=20, highfreq=8000)
         np.save(wav[:-4] + '.npy', psf_mfcc_feat)
-        try:
-            os.remove(wav)
-        except OSError:
-            pass
     print(utt2dur_path)
     try:
         os.remove(utt2dur_path)

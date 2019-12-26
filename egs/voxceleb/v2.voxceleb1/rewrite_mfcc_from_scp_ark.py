@@ -9,10 +9,10 @@ import numpy as np
 from kaldiio import ReadHelper, WriteHelper
 
 
-def extract_mfcc(name):
+def extract_mfcc(name, original_mfcc_dir):
     utt_id2mfcc = {}
     #original_mfcc_dir = '/home/sangjik/kaldi/egs/voxceleb/v2.smallest/mfcc'
-    original_mfcc_dir = './mfcc.djt_by_aws'
+    #original_mfcc_dir = './mfcc.djt_by_aws'
     for scp in glob(p_join(original_mfcc_dir, 'raw_mfcc_{}.*.scp'.format(name))):
         num = scp.split('.')[-2]
         print('extract:', scp)
@@ -27,8 +27,7 @@ def extract_mfcc(name):
                 utt_id2mfcc[utt_id] = mfcc_npy
     return utt_id2mfcc
 
-def rewrite(name):
-    mfcc_dir = './mfcc.rewrite'
+def rewrite(name, mfcc_dir):
     os.makedirs(mfcc_dir, exist_ok=True)
     with open(name + '.json', 'r') as fp:
         utt_id2mfcc = json.load(fp)
@@ -52,12 +51,13 @@ def rewrite(name):
                     print('KeyError:', utt_id)
 
 if __name__ == '__main__':
-    #utt_id2mfcc = extract_mfcc('train')
+    mfcc_dir = './mfcc'
+    #utt_id2mfcc = extract_mfcc('train', './mfcc.djt_by_aws')
     #with open('train.json', 'w') as fp:
     #    json.dump(utt_id2mfcc, fp)
-    rewrite('train')
+    #rewrite('train', mfcc_dir)
 
-    #utt_id2mfcc = extract_mfcc('voxceleb1_test')
+    #utt_id2mfcc = extract_mfcc('voxceleb1_test', './mfcc.djt_by_aws')
     #with open('voxceleb1_test.json', 'w') as fp:
     #    json.dump(utt_id2mfcc, fp)
-    rewrite('voxceleb1_test')
+    #rewrite('voxceleb1_test', mfcc_dir)

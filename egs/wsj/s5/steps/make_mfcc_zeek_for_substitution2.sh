@@ -158,9 +158,9 @@ else
   #    echo zeeeeeek-1: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`
   #  fi
   #done
-  mkdir -p mfcc_input_wav
-  ./compute_brainsoft_mfcc $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav
-  echo "end_of_ZZZZZZZZZZZZZZZ else:  "
+  ######mkdir -p mfcc_input_wav
+  ######./compute_brainsoft_mfcc $logdir/wav_${name} $mfccdir/raw_mfcc mfcc_input_wav
+  ######echo "end_of_ZZZZZZZZZZZZZZZ else:  "
   #for n in $(seq $nj); do
   #  if [ -f $logdir/utt2dur.$n ]; then
   #    echo zeeeeeek0: utt2dur.$n len: `wc -l $logdir/utt2dur.$n`

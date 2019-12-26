@@ -20,6 +20,11 @@ EER: 3.293%
 minDCF(p-target=0.01): 0.3645
 minDCF(p-target=0.001): 0.5002
 
+
+
+
+
+
 ==== origianl dataset but aug_1thousand,                  (psf_mfcc, x-vector, TDNN, local_PC)
 real    3756m38.636s
 user    14842m29.638s
@@ -33,6 +38,24 @@ minDCF(p-target=0.01): 0.3607
 minDCF(p-target=0.001): 0.5121
 
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.psf_mfcc"
+
+/home/sangjik/speaker_verification/kaldi/xvector_nnet_1a.total_dataset_kaldidefault.max_pooled_djt_mfcc
+
+
+
+
+==== origianl dataset but aug_100thousand,                  (max_pooling from djt_mfcc, x-vector, TDNN, v100 8대)
+약 9시간 걸림(stage4부터 했을때)
+$ time ./run.sh >stdout
+real    539m0.648s
+user    22890m50.022s
+sys 246m57.697s
+
+EER: 8.229%
+minDCF(p-target=0.01): 0.6819
+minDCF(p-target=0.001): 0.8934
+
+
 
 -----------------------------------------------------------------
 
@@ -146,6 +169,17 @@ minDCF(p-target=0.001): 0.9799
 
 ------------------------------------------
 
+==== VoxCeleb1 with 50 aug, psf_mfcc, local_PC, nj=num_cpu(==12)
+끊어서해서 시간은 잘 모르겠다
+근데 step9.1에서 2시간반이상 걸리더라,
+
+EER: 7.397% Thu Dec 12 04:02:25 UTC 2019
+minDCF(p-target=0.01): 0.6197
+minDCF(p-target=0.001): 0.6659
+
+
+
+
 ==== VoxCeleb1 with 100,000 aug, psf_mfcc, local_PC, nj=num_cpu(==12)
 8시간 걸림
 
@@ -201,4 +235,6 @@ sys     130m42.452s
 EER: 13.48% Wed Dec 11 09:40:13 UTC 2019
 minDCF(p-target=0.01): 0.8220
 minDCF(p-target=0.001): 0.8529
+
+
 

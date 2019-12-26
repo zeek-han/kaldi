@@ -27,53 +27,53 @@ egs_dir="${nnet_dir}/egs"
 . ./cmd.sh
 . ./utils/parse_options.sh
 
-num_pdfs=$(awk '{print $2}' $data/utt2spk | sort | uniq -c | wc -l)
-
-# Now we create the nnet examples using sid/nnet3/xvector/get_egs.sh.
-# The argument --num-repeats is related to the number of times a speaker
-# repeats per archive.  If it seems like you're getting too many archives
-# (e.g., more than 200) try increasing the --frames-per-iter option.  The
-# arguments --min-frames-per-chunk and --max-frames-per-chunk specify the
-# minimum and maximum length (in terms of number of frames) of the features
-# in the examples.
+#num_pdfs=$(awk '{print $2}' $data/utt2spk | sort | uniq -c | wc -l)
 #
-# To make sense of the egs script, it may be necessary to put an "exit 1"
-# command immediately after stage 3.  Then, inspect
-# exp/<your-dir>/egs/temp/ranges.* . The ranges files specify the examples that
-# will be created, and which archives they will be stored in.  Each line of
-# ranges.* has the following form:
-#    <utt-id> <local-ark-indx> <global-ark-indx> <start-frame> <end-frame> <spk-id>
-# For example:
-#    100304-f-sre2006-kacg-A 1 2 4079 881 23
-
-# If you're satisfied with the number of archives (e.g., 50-150 archives is
-# reasonable) and with the number of examples per speaker (e.g., 1000-5000
-# is reasonable) then you can let the script continue to the later stages.
-# Otherwise, try increasing or decreasing the --num-repeats option.  You might
-# need to fiddle with --frames-per-iter.  Increasing this value decreases the
-# the number of archives and increases the number of examples per archive.
-# Decreasing this value increases the number of archives, while decreasing the
-# number of examples per archive.
-if [ $stage -le 6 ]; then
-  echo "stage=6"
-  echo "$0: Getting neural network training egs";
-  # dump egs.
-  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d $egs_dir/storage ]; then
-    utils/create_split_dir.pl \
-     /media/sangjik/hdd2/kaldi_voxceleb/b{03,04,05,06}/$USER/kaldi-data/egs/voxceleb2/v2/xvector-$(date +'%m_%d_%H_%M')/$egs_dir/storage $egs_dir/storage
-  fi
-  sid/nnet3/xvector/get_egs.sh --cmd "$train_cmd" \
-    --nj 2 \
-    --stage 0 \
-    --frames-per-iter 1000000000 \
-    --frames-per-iter-diagnostic 100000 \
-    --min-frames-per-chunk 200 \
-    --max-frames-per-chunk 400 \
-    --num-diagnostic-archives 3 \
-    --num-repeats 50 \
-    "$data" $egs_dir
-fi
-
+## Now we create the nnet examples using sid/nnet3/xvector/get_egs.sh.
+## The argument --num-repeats is related to the number of times a speaker
+## repeats per archive.  If it seems like you're getting too many archives
+## (e.g., more than 200) try increasing the --frames-per-iter option.  The
+## arguments --min-frames-per-chunk and --max-frames-per-chunk specify the
+## minimum and maximum length (in terms of number of frames) of the features
+## in the examples.
+##
+## To make sense of the egs script, it may be necessary to put an "exit 1"
+## command immediately after stage 3.  Then, inspect
+## exp/<your-dir>/egs/temp/ranges.* . The ranges files specify the examples that
+## will be created, and which archives they will be stored in.  Each line of
+## ranges.* has the following form:
+##    <utt-id> <local-ark-indx> <global-ark-indx> <start-frame> <end-frame> <spk-id>
+## For example:
+##    100304-f-sre2006-kacg-A 1 2 4079 881 23
+#
+## If you're satisfied with the number of archives (e.g., 50-150 archives is
+## reasonable) and with the number of examples per speaker (e.g., 1000-5000
+## is reasonable) then you can let the script continue to the later stages.
+## Otherwise, try increasing or decreasing the --num-repeats option.  You might
+## need to fiddle with --frames-per-iter.  Increasing this value decreases the
+## the number of archives and increases the number of examples per archive.
+## Decreasing this value increases the number of archives, while decreasing the
+## number of examples per archive.
+#if [ $stage -le 6 ]; then
+#  echo "stage=6"
+#  echo "$0: Getting neural network training egs";
+#  # dump egs.
+#  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d $egs_dir/storage ]; then
+#    utils/create_split_dir.pl \
+#     /media/sangjik/hdd2/kaldi_voxceleb/b{03,04,05,06}/$USER/kaldi-data/egs/voxceleb2/v2/xvector-$(date +'%m_%d_%H_%M')/$egs_dir/storage $egs_dir/storage
+#  fi
+#  sid/nnet3/xvector/get_egs.sh --cmd "$train_cmd" \
+#    --nj 2 \
+#    --stage 0 \
+#    --frames-per-iter 1000000000 \
+#    --frames-per-iter-diagnostic 100000 \
+#    --min-frames-per-chunk 200 \
+#    --max-frames-per-chunk 400 \
+#    --num-diagnostic-archives 3 \
+#    --num-repeats 50 \
+#    "$data" $egs_dir
+#fi
+#
 if [ $stage -le 7 ]; then
   echo "stage=7"
   echo "$0: creating neural net configs using the xconfig parser";
@@ -97,7 +97,8 @@ if [ $stage -le 7 ]; then
 
   # The frame-level layers
   input dim=${feat_dim} name=input
-  relu-batchnorm-layer name=tdnn0 input=Append(-5,-4,-3,-2-1,0,1,2,3,4) dim=${feat_dim}
+  attention-relu-batchnorm-layer name=attention0 key-dim=20 value-dim=20 \
+                                 time-stride=10 num-left-inputs=5 num-right-inputs=4
   relu-batchnorm-layer name=tdnn1 input=Append(-2,-1,0,1,2) dim=512
   relu-batchnorm-layer name=tdnn2 input=Append(-2,0,2) dim=512
   relu-batchnorm-layer name=tdnn3 input=Append(-3,0,3) dim=512
@@ -134,13 +135,13 @@ fi
 dropout_schedule='0,0@0.20,0.1@0.50,0'
 srand=123
 if [ $stage -le 8 ]; then
-  echo "stage=8"
+  echo "stage=8, nnet_dir=$nnet_dir"
   steps/nnet3/train_raw_dnn.py --stage=$train_stage \
     --cmd="$train_cmd" \
     --trainer.optimization.proportional-shrink 10 \
     --trainer.optimization.momentum=0.5 \
     --trainer.optimization.num-jobs-initial=3 \
-    --trainer.optimization.num-jobs-final=8 \
+    --trainer.optimization.num-jobs-final=5 \
     --trainer.optimization.initial-effective-lrate=0.001 \
     --trainer.optimization.final-effective-lrate=0.0001 \
     --trainer.optimization.minibatch-size=64 \
@@ -155,6 +156,7 @@ if [ $stage -le 8 ]; then
     --cleanup.preserve-model-interval=10 \
     --use-gpu=wait \
     --dir=$nnet_dir  || exit 1;
+    #--trainer.optimization.num-jobs-final=8 \
 fi
 
 exit 0;

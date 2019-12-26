@@ -139,7 +139,7 @@ if [ $stage -le 8 ]; then
     --trainer.optimization.proportional-shrink 10 \
     --trainer.optimization.momentum=0.5 \
     --trainer.optimization.num-jobs-initial=3 \
-    --trainer.optimization.num-jobs-final=8 \
+    --trainer.optimization.num-jobs-final=1	\
     --trainer.optimization.initial-effective-lrate=0.001 \
     --trainer.optimization.final-effective-lrate=0.0001 \
     --trainer.optimization.minibatch-size=64 \
@@ -148,7 +148,6 @@ if [ $stage -le 8 ]; then
     --trainer.num-epochs=3 \
     --trainer.dropout-schedule="$dropout_schedule" \
     --trainer.shuffle-buffer-size=1000 \
-    --trainer.optimization.num-jobs-final=1	\
     --egs.frames-per-eg=1 \
     --egs.dir="$egs_dir" \
     --cleanup.remove-egs $remove_egs \

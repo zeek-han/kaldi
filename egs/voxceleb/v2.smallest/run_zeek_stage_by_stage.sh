@@ -72,18 +72,22 @@ if [ $stage -le 0 ]; then
 # fix_data_dir.sh에서 filter는 utils/filter_scp.pl이 기본인것 같은데, 얘는 그냥 speaker-id리스트와 utt-id리스트를 받아서 utt중에 speaker-id에 있는애들만 뽑아내는것 같다
 fi
 
-#if [ $stage -le 1 ]; then
+if [ $stage -le 1 ]; then
 #  # Make MFCCs and compute the energy-based VAD for each dataset
-#  for name in train voxceleb1_test; do
-#    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 40 --cmd "$train_cmd" \
-#      data/${name} exp/make_mfcc $mfccdir
+  for name in train voxceleb1_test; do
+    steps/make_mfcc.sh --write-utt2num-frames true --mfcc-config conf/mfcc.conf --nj 40 --cmd "$train_cmd" \
+      data/${name} exp/make_mfcc $mfccdir
 #########steps/make_mfcc.sh를 하면 ./mfcc에 raw_mfcc_${name}.scp와 .ark가 생긴다.  이게 바로 mfcc
-#    utils/fix_data_dir.sh data/${name}
-#    sid/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
-#      data/${name} exp/make_vad $vaddir
-#    utils/fix_data_dir.sh data/${name}
-#  done
+#########steps/make_mfcc.sh를 하면 ./data/train에 feats.scp와 utt2num_frames, utt2dur, frame_shift, conf(dir) 가 생긴다
+    utils/fix_data_dir.sh data/${name} 
+###########fix_data_dir을 하면, ./data/train에 reco2dur이 생긴다 (진짜? stage2 처음에 생기는것 같은데?)
+    sid/compute_vad_decision.sh --nj 40 --cmd "$train_cmd" \
+      data/${name} exp/make_vad $vaddir
+###########compute_vad_decisions을 하면, ./data/train에 vad.scp가 이때 생기는것으로 추정, exp/make_vad도 죄다 이때만들거야
+    utils/fix_data_dir.sh data/${name}
+  done
 #fi
+####stage1을 끝내면 ./data디렉에는 conf  feats.scp  frame_shift  split8  utt2dur  utt2num_frames  vad.scp  이 새로생김
 
 ## In this section, we augment the VoxCeleb2 data with reverberation,
 ## noise, music, and babble, and combine it with the clean data.
