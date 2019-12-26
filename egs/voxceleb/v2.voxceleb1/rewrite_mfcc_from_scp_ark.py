@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os
+import os, sys
 from os.path import basename, dirname, join as p_join
 from glob import glob
 import json
@@ -9,14 +9,12 @@ import numpy as np
 from kaldiio import ReadHelper, WriteHelper
 
 
-def extract_mfcc(name, original_mfcc_dir):
+def extract_mfcc(name, original_mfcc_dir, mfcc_npy_root_dir):
     utt_id2mfcc = {}
-    #original_mfcc_dir = '/home/sangjik/kaldi/egs/voxceleb/v2.smallest/mfcc'
-    #original_mfcc_dir = './mfcc.djt_by_aws'
     for scp in glob(p_join(original_mfcc_dir, 'raw_mfcc_{}.*.scp'.format(name))):
         num = scp.split('.')[-2]
         print('extract:', scp)
-        mfcc_npy_dir = p_join('mfcc_npy', name + '.' + num)
+        mfcc_npy_dir = p_join(mfcc_npy_root_dir, name + '.' + num)
         os.makedirs(mfcc_npy_dir, exist_ok=True)
         with ReadHelper('scp:' + scp) as reader:
             for utt_id, mfcc in reader:
@@ -27,11 +25,11 @@ def extract_mfcc(name, original_mfcc_dir):
                 utt_id2mfcc[utt_id] = mfcc_npy
     return utt_id2mfcc
 
-def rewrite(name, mfcc_dir):
+def rewrite(name, mfcc_dir, mfcc_scp_dir):
     os.makedirs(mfcc_dir, exist_ok=True)
     with open(name + '.json', 'r') as fp:
         utt_id2mfcc = json.load(fp)
-    for scp in glob(p_join('./mfcc_scp', 'raw_mfcc_{}.*.scp'.format(name))):
+    for scp in glob(p_join(mfcc_scp_dir, 'raw_mfcc_{}.*.scp'.format(name))):
     #for scp in glob(p_join('./mfcc_scp', 'raw_mfcc_{}.*.scp'.format(name))):
         with open(scp, 'r') as scp_f:
             utt_ids = sorted([line.split(' ')[0] for line \
@@ -51,13 +49,17 @@ def rewrite(name, mfcc_dir):
                     print('KeyError:', utt_id)
 
 if __name__ == '__main__':
-    mfcc_dir = './mfcc'
-    #utt_id2mfcc = extract_mfcc('train', './mfcc.djt_by_aws')
-    #with open('train.json', 'w') as fp:
-    #    json.dump(utt_id2mfcc, fp)
-    #rewrite('train', mfcc_dir)
+    from_mfcc_dir = sys.argv[1]
+    mfcc_npy_root_dir = sys.argv[2]
+    mfcc_output_dir = sys.argv[3]
+    mfcc_scp_dir = sys.argv[4]
 
-    #utt_id2mfcc = extract_mfcc('voxceleb1_test', './mfcc.djt_by_aws')
-    #with open('voxceleb1_test.json', 'w') as fp:
-    #    json.dump(utt_id2mfcc, fp)
-    #rewrite('voxceleb1_test', mfcc_dir)
+    utt_id2mfcc = extract_mfcc('train', from_mfcc_dir, mfcc_npy_root_dir)
+    with open('train.json', 'w') as fp:
+        json.dump(utt_id2mfcc, fp)
+    rewrite('train', mfcc_output_dir, mfcc_scp_dir)
+
+    utt_id2mfcc = extract_mfcc('voxceleb1_test', from_mfcc_dir, mfcc_npy_root_dir)
+    with open('voxceleb1_test.json', 'w') as fp:
+        json.dump(utt_id2mfcc, fp)
+    rewrite('voxceleb1_test', mfcc_output_dir, mfcc_scp_dir)

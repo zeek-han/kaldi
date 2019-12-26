@@ -158,7 +158,8 @@ stage=0
 #if [ $stage -le 5 ]; then
 #  # Now, we need to remove features that are too short after removing silence
 #  # frames.  We want atleast 5s (500 frames) per utterance.
-#  min_len=400
+############## djt_MFCC 1msec해상도이므로, min_len 를 400에서  4000으로 변경
+#  min_len=4000
 #  mv data/train_combined_no_sil/utt2num_frames data/train_combined_no_sil/utt2num_frames.bak
 #  awk -v min_len=${min_len} '$2 > min_len {print $1, $2}' data/train_combined_no_sil/utt2num_frames.bak > data/train_combined_no_sil/utt2num_frames
 #  echo stage_5.1  `date`
@@ -187,8 +188,9 @@ stage=0
 
 # Stages 6 through 8 are handled in run_xvector.sh
 #local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
+#local/nnet3/xvector/run_xvector.add_0framelayer.sh --stage $stage --train-stage -1 \
 #local/nnet3/xvector/run_xvector.add_0framelayer_conv.sh --stage $stage --train-stage -1 \
-local/nnet3/xvector/run_xvector.add_0framelayer.sh --stage $stage --train-stage -1 \
+local/nnet3/xvector/run_xvector.dnn_from17_5layers.sh --stage $stage --train-stage -1 \
   --data data/train_combined_no_sil --nnet-dir $nnet_dir \
   --egs-dir $nnet_dir/egs
 
