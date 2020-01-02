@@ -20,7 +20,7 @@ dataset_root="/media/sangjik/hdd2"
 voxceleb1_trials=data/voxceleb1_test/trials
 voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
 voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
-nnet_dir="/media/sangjik/hdd1/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_add1layerTest_conv"
+nnet_dir="/media/sangjik/hdd2/speaker_verification/kaldi/xvector_nnet_1a.voxceleb1_dnn_from_17_5layers"
 musan_root=$dataset_root/dataset/sound/musan
 num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 
@@ -158,7 +158,7 @@ stage=0
 #if [ $stage -le 5 ]; then
 #  # Now, we need to remove features that are too short after removing silence
 #  # frames.  We want atleast 5s (500 frames) per utterance.
-############## djt_MFCC 1msec해상도이므로, min_len 를 400에서  4000으로 변경
+############### djt_MFCC 1msec해상도이므로, min_len 를 400에서  4000으로 변경
 #  min_len=4000
 #  mv data/train_combined_no_sil/utt2num_frames data/train_combined_no_sil/utt2num_frames.bak
 #  awk -v min_len=${min_len} '$2 > min_len {print $1, $2}' data/train_combined_no_sil/utt2num_frames.bak > data/train_combined_no_sil/utt2num_frames
@@ -186,24 +186,25 @@ stage=0
 #  echo stage_5.5  `date`
 #fi
 
-# Stages 6 through 8 are handled in run_xvector.sh
-#local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
-#local/nnet3/xvector/run_xvector.add_0framelayer.sh --stage $stage --train-stage -1 \
-#local/nnet3/xvector/run_xvector.add_0framelayer_conv.sh --stage $stage --train-stage -1 \
-local/nnet3/xvector/run_xvector.dnn_from17_5layers.sh --stage $stage --train-stage -1 \
-  --data data/train_combined_no_sil --nnet-dir $nnet_dir \
-  --egs-dir $nnet_dir/egs
+## Stages 6 through 8 are handled in run_xvector.sh
+##local/nnet3/xvector/run_xvector_smallest.sh --stage $stage --train-stage -1 \
+##local/nnet3/xvector/run_xvector.add_0framelayer.sh --stage $stage --train-stage -1 \
+#local/nnet3/xvector/run_xvector.dnn_from17_5layers.sh --stage $stage --train-stage -1 \
+#  --data data/train_combined_no_sil --nnet-dir $nnet_dir \
+#  --egs-dir $nnet_dir/egs
 
 if [ $stage -le 9 ]; then
   # Extract x-vectors for centering, LDA, and PLDA training.
   echo stage9.1  `date`
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  #sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  sid/nnet3/xvector/extract_xvectors_1msec_resolution.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
     $nnet_dir data/train \
     $nnet_dir/xvectors_train
 
   # Extract x-vectors used in the evaluation.
   echo stage9.2  `date`
-  sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  #sid/nnet3/xvector/extract_xvectors.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
+  sid/nnet3/xvector/extract_xvectors_1msec_resolution.sh --cmd "$train_cmd --mem 4G" --nj $num_cpu \
     $nnet_dir data/voxceleb1_test \
     $nnet_dir/xvectors_voxceleb1_test
 fi
