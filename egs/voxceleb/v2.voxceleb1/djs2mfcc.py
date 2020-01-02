@@ -130,7 +130,6 @@ def save_mfcc(djs, output_dir='./'):
     lowest_freq = 50
     highest_freq = 7600
 
-
     # mfcc from DJS
     djspec_square = power_spectrogram(djs, lowest_freq, highest_freq)
     mfcc_from_djs = mfcc(djspec_square, n_mfcc=n_mfcc, n_mels=n_mels, 
@@ -145,6 +144,7 @@ if __name__ == '__main__':
     output_dir = sys.argv[2]
 
     djses = glob(p_join(djs_root_dir, '**', '*.djs'), recursive=True)
+    print(djses)
     this_save_djs = partial(save_mfcc, output_dir=output_dir)
     num_of_cpus = cpu_count()
     with Pool(num_of_cpus, maxtasksperchild=100) as p:
