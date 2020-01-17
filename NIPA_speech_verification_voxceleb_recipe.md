@@ -11,5 +11,13 @@ v2에 대한 참조논문은 다음과 같다. http://www.danielpovey.com/files/
 v2의 작동법은 다음과 같다
 1. kaldi docker를 실행한다
 2. ./cmd.sh를 열어서 export train_cmd="run.pl --mem 4G"로 고쳐준다
-3.
+3. ./run.sh를 열어서 처음에 나오는 path들을 모두 각자의 상황에 맞게 고쳐준다. 
+  예를들어 나는 다음과 같이 고쳤다
+dataset_root="/media/sangjik/hdd2"
+voxceleb1_trials=data/voxceleb1_test/trials
+voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
+voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
+nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.total_djt"
+musan_root=$dataset_root/dataset/sound/musan
+num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
 
