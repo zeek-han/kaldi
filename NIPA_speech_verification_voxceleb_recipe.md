@@ -19,5 +19,5 @@ voxceleb1_root=$dataset_root/dataset/speech/English/VoxCeleb1
 voxceleb2_root=$dataset_root/dataset/speech/English/VoxCeleb2
 nnet_dir="$dataset_root/speaker_verification/kaldi/xvector_nnet_1a.total_djt"
 musan_root=$dataset_root/dataset/sound/musan
-num_cpu=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l`
+num_cpu=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
 
